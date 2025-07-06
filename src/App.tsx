@@ -1,9 +1,79 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Camera, MapPin, DollarSign, Calendar, CheckSquare, Search, Upload, Brain, Users, Home, TrendingUp, Calculator, Zap, Star, Clock, ChevronRight, Plus, X, Check, Eye, MessageCircle, Heart, Share2, Filter } from 'lucide-react';
 
-const MovingAssistantApp = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [items, setItems] = useState([
+interface Item {
+  id: number;
+  name: string;
+  image: string | null;
+  estimatedValue: number;
+  marketResearch: string;
+  status: string;
+  condition: string;
+  tags: string[];
+  views: number;
+  likes: number;
+}
+
+interface Apartment {
+  id: number;
+  address: string;
+  rent: number;
+  visited: boolean;
+  notes: string;
+  score: number;
+  photos: number;
+  amenities: string[];
+  commute: string;
+  available: string;
+  virtual_tour: boolean;
+}
+
+interface Expense {
+  id: number;
+  category: string;
+  item: string;
+  amount: number;
+  type: string;
+  details: string;
+  emoji: string;
+}
+
+interface Todo {
+  id: number;
+  task: string;
+  agent: string;
+  completed: boolean;
+  priority: string;
+  emoji: string;
+}
+
+interface Message {
+  id: number;
+  type: string;
+  agent?: string;
+  content: string;
+  timestamp: string;
+  actions?: string[];
+  recommendations?: string[];
+  quickActions?: string[];
+  reactions: any[];
+}
+
+interface Agent {
+  active: boolean;
+  lastAction: string | null;
+  emoji: string;
+}
+
+interface Notification {
+  id: number;
+  message: string;
+  type: string;
+}
+
+const MovingAssistantApp: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [items, setItems] = useState<Item[]>([
     { 
       id: 1, 
       name: 'MacBook Pro 16" M3', 
@@ -15,9 +85,34 @@ const MovingAssistantApp = () => {
       tags: ['tech', 'laptop', 'apple'],
       views: 0,
       likes: 0
+    },
+    { 
+      id: 2, 
+      name: 'IKEA KIVIK Sofa', 
+      image: null, 
+      estimatedValue: 350, 
+      marketResearch: 'IKEA sofas selling fast in SF - yours could go for $300-400 easy', 
+      status: 'pending',
+      condition: 'Good',
+      tags: ['furniture', 'living room'],
+      views: 0,
+      likes: 0
+    },
+    {
+      id: 3,
+      name: 'iPhone 15 Pro',
+      image: null,
+      estimatedValue: 900,
+      marketResearch: 'iPhone 15 Pro still holding value - $850-950 range',
+      status: 'listed',
+      condition: 'Excellent',
+      tags: ['tech', 'phone', 'apple'],
+      views: 23,
+      likes: 5
     }
   ]);
-  const [apartments, setApartments] = useState([
+  
+  const [apartments, setApartments] = useState<Apartment[]>([
     { 
       id: 1, 
       address: '123 E 34th St, Manhattan', 
@@ -30,15 +125,51 @@ const MovingAssistantApp = () => {
       commute: '15 min to FiDi',
       available: '2025-08-01',
       virtual_tour: true
+    },
+    { 
+      id: 2, 
+      address: '456 Brooklyn Ave, Williamsburg', 
+      rent: 2800, 
+      visited: true, 
+      notes: 'Brooklyn hipster paradise 🎨 Amazing coffee shops nearby', 
+      score: 8,
+      photos: 12,
+      amenities: ['rooftop', 'bike storage', 'pet friendly'],
+      commute: '25 min to Manhattan',
+      available: '2025-07-15',
+      virtual_tour: true
+    },
+    {
+      id: 3,
+      address: '789 LES Delancey St',
+      rent: 3200,
+      visited: false,
+      notes: 'Lower East Side energy! 🌃 Nightlife central',
+      score: 0,
+      photos: 6,
+      amenities: ['doorman', 'gym'],
+      commute: '10 min to SoHo',
+      available: '2025-08-15',
+      virtual_tour: false
     }
   ]);
-  const [expenses, setExpenses] = useState([
-    { id: 1, category: 'Housing', item: 'Rent Difference (SF→NYC)', amount: 800, type: 'monthly', details: 'SF: $2700/mo → NYC: $3500/mo', emoji: '🏠' }
+
+  const [expenses, setExpenses] = useState<Expense[]>([
+    { id: 1, category: 'Housing', item: 'Rent Difference (SF→NYC)', amount: 800, type: 'monthly', details: 'SF: $2700/mo → NYC: $3500/mo', emoji: '🏠' },
+    { id: 2, category: 'Transportation', item: 'No More Car Payments!', amount: -650, type: 'monthly', details: 'Car payment + insurance + gas savings', emoji: '🚗' },
+    { id: 3, category: 'Moving', item: 'Cross-Country Movers', amount: 3500, type: 'one-time', details: 'Full-service moving company', emoji: '📦' },
+    { id: 4, category: 'Food', item: 'NYC Food Scene', amount: 200, type: 'monthly', details: 'More expensive but way better options', emoji: '🍕' },
+    { id: 5, category: 'Entertainment', item: 'NYC Nightlife', amount: 150, type: 'monthly', details: 'Broadway, clubs, events', emoji: '🎭' }
   ]);
-  const [todos, setTodos] = useState([
-    { id: 1, task: 'Take photos of MacBook', agent: 'itemValuationAgent', completed: false, priority: 'high', emoji: '📱' }
+
+  const [todos, setTodos] = useState<Todo[]>([
+    { id: 1, task: 'Take photos of MacBook', agent: 'itemValuationAgent', completed: false, priority: 'high', emoji: '📱' },
+    { id: 2, task: 'Schedule Brooklyn apt visit', agent: 'apartmentAgent', completed: false, priority: 'high', emoji: '🗓️' },
+    { id: 3, task: 'Research NYC tax rates', agent: 'expenseAgent', completed: false, priority: 'medium', emoji: '💸' },
+    { id: 4, task: 'List iPhone on FB Marketplace', agent: 'itemValuationAgent', completed: true, priority: 'high', emoji: '✅' }
   ]);
-  const [messages, setMessages] = useState([{
+
+  const [messages, setMessages] = useState<Message[]>([{
     id: Date.now(),
     type: 'agent',
     agent: 'coordinatorAgent',
@@ -46,124 +177,23 @@ const MovingAssistantApp = () => {
     timestamp: new Date().toLocaleTimeString(),
     reactions: []
   }]);
-  const [currentInput, setCurrentInput] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [showQuickActions, setShowQuickActions] = useState(false);
-  const [selectedPhoto, setSelectedPhoto] = useState(null);
-  const [showCalendar, setShowCalendar] = useState(false);
-  const fileInputRef = useRef(null);
-  const [notifications, setNotifications] = useState([]);
 
-  // Multi-agent system state
-  const [agents, setAgents] = useState({
+  const [currentInput, setCurrentInput] = useState<string>('');
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [showQuickActions, setShowQuickActions] = useState<boolean>(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [showCalendar, setShowCalendar] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const [agents, setAgents] = useState<Record<string, Agent>>({
     itemValuationAgent: { active: false, lastAction: null, emoji: '💰' },
     apartmentAgent: { active: false, lastAction: null, emoji: '🏠' },
     expenseAgent: { active: false, lastAction: null, emoji: '📊' },
     coordinatorAgent: { active: false, lastAction: null, emoji: '🧠' }
   });
 
-  // Sample data initialization with Gen-Z friendly content
-  useEffect(() => {
-    setItems([
-      { 
-        id: 1, 
-        name: 'MacBook Pro 16" M3', 
-        image: null, 
-        estimatedValue: 2400, 
-        marketResearch: 'M3 MacBooks are 🔥 rn - similar ones going for $2200-2600', 
-        status: 'researching',
-        condition: 'Like New',
-        tags: ['tech', 'laptop', 'apple'],
-        views: 0,
-        likes: 0
-      },
-      { 
-        id: 2, 
-        name: 'IKEA KIVIK Sofa', 
-        image: null, 
-        estimatedValue: 350, 
-        marketResearch: 'IKEA sofas selling fast in SF - yours could go for $300-400 easy', 
-        status: 'pending',
-        condition: 'Good',
-        tags: ['furniture', 'living room'],
-        views: 0,
-        likes: 0
-      },
-      {
-        id: 3,
-        name: 'iPhone 15 Pro',
-        image: null,
-        estimatedValue: 900,
-        marketResearch: 'iPhone 15 Pro still holding value - $850-950 range',
-        status: 'listed',
-        condition: 'Excellent',
-        tags: ['tech', 'phone', 'apple'],
-        views: 23,
-        likes: 5
-      }
-    ]);
-    
-    setApartments([
-      { 
-        id: 1, 
-        address: '123 E 34th St, Manhattan', 
-        rent: 3500, 
-        visited: false, 
-        notes: 'Midtown vibes ✨ Close to everything', 
-        score: 0,
-        photos: 8,
-        amenities: ['gym', 'rooftop', 'laundry'],
-        commute: '15 min to FiDi',
-        available: '2025-08-01',
-        virtual_tour: true
-      },
-      { 
-        id: 2, 
-        address: '456 Brooklyn Ave, Williamsburg', 
-        rent: 2800, 
-        visited: true, 
-        notes: 'Brooklyn hipster paradise 🎨 Amazing coffee shops nearby', 
-        score: 8,
-        photos: 12,
-        amenities: ['rooftop', 'bike storage', 'pet friendly'],
-        commute: '25 min to Manhattan',
-        available: '2025-07-15',
-        virtual_tour: true
-      },
-      {
-        id: 3,
-        address: '789 LES Delancey St',
-        rent: 3200,
-        visited: false,
-        notes: 'Lower East Side energy! 🌃 Nightlife central',
-        score: 0,
-        photos: 6,
-        amenities: ['doorman', 'gym'],
-        commute: '10 min to SoHo',
-        available: '2025-08-15',
-        virtual_tour: false
-      }
-    ]);
-
-    setExpenses([
-      { id: 1, category: 'Housing', item: 'Rent Difference (SF→NYC)', amount: 800, type: 'monthly', details: 'SF: $2700/mo → NYC: $3500/mo', emoji: '🏠' },
-      { id: 2, category: 'Transportation', item: 'No More Car Payments!', amount: -650, type: 'monthly', details: 'Car payment + insurance + gas savings', emoji: '🚗' },
-      { id: 3, category: 'Moving', item: 'Cross-Country Movers', amount: 3500, type: 'one-time', details: 'Full-service moving company', emoji: '📦' },
-      { id: 4, category: 'Food', item: 'NYC Food Scene', amount: 200, type: 'monthly', details: 'More expensive but way better options', emoji: '🍕' },
-      { id: 5, category: 'Entertainment', item: 'NYC Nightlife', amount: 150, type: 'monthly', details: 'Broadway, clubs, events', emoji: '🎭' }
-    ]);
-
-    setTodos([
-      { id: 1, task: 'Take photos of MacBook', agent: 'itemValuationAgent', completed: false, priority: 'high', emoji: '📱' },
-      { id: 2, task: 'Schedule Brooklyn apt visit', agent: 'apartmentAgent', completed: false, priority: 'high', emoji: '🗓️' },
-      { id: 3, task: 'Research NYC tax rates', agent: 'expenseAgent', completed: false, priority: 'medium', emoji: '💸' },
-      { id: 4, task: 'List iPhone on FB Marketplace', agent: 'itemValuationAgent', completed: true, priority: 'high', emoji: '✅' }
-    ]);
-
-    // Data is already initialized above, no need to set again
-  }, []);
-
-  const handleAgentQuery = async (query, targetAgent = 'coordinatorAgent') => {
+  const handleAgentQuery = async (query: string, targetAgent: string = 'coordinatorAgent'): Promise<void> => {
     setIsProcessing(true);
     setAgents(prev => ({ ...prev, [targetAgent]: { ...prev[targetAgent], active: true } }));
 
@@ -197,7 +227,6 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
       const response = await window.claude.complete(prompt);
       const agentResponse = JSON.parse(response);
 
-      // Update state based on agent response
       if (agentResponse.updates.items?.length > 0) {
         setItems(prev => [...prev, ...agentResponse.updates.items]);
       }
@@ -215,7 +244,8 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
         id: Date.now(),
         type: 'user',
         content: query,
-        timestamp: new Date().toLocaleTimeString()
+        timestamp: new Date().toLocaleTimeString(),
+        reactions: []
       }, {
         id: Date.now() + 1,
         type: 'agent',
@@ -245,7 +275,7 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
     }
   };
 
-  const addNotification = (message, type = 'success') => {
+  const addNotification = (message: string, type: string = 'success'): void => {
     const id = Date.now();
     setNotifications(prev => [...prev, { id, message, type }]);
     setTimeout(() => {
@@ -253,15 +283,13 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
     }, 3000);
   };
 
-  const handlePhotoUpload = async (event) => {
-    const file = event.target.files[0];
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
-    // Create preview URL
     const imageUrl = URL.createObjectURL(file);
     setSelectedPhoto(imageUrl);
 
-    // Simulate AI photo analysis
     addNotification('Analyzing photo... 📸', 'info');
     
     setTimeout(async () => {
@@ -270,22 +298,29 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
     }, 2000);
   };
 
-  const handleQuickAction = async (action) => {
+  const handleQuickAction = async (action: string): Promise<void> => {
     setShowQuickActions(false);
     await handleAgentQuery(action);
   };
 
-  const scheduleApartmentVisit = async (apartmentId) => {
+  const scheduleApartmentVisit = async (apartmentId: number): Promise<void> => {
     const apartment = apartments.find(apt => apt.id === apartmentId);
     if (!apartment) return;
 
-    // Simulate calendar integration
     addNotification('Opening calendar... 📅', 'info');
     
     setTimeout(async () => {
       await handleAgentQuery(`Schedule a visit for the apartment at ${apartment.address} this weekend`, 'apartmentAgent');
       addNotification('Visit scheduled! 🗓️', 'success');
     }, 1500);
+  };
+
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
+    e.preventDefault();
+    if (!currentInput.trim()) return;
+
+    await handleAgentQuery(currentInput);
+    setCurrentInput('');
   };
 
   const quickActions = [
@@ -297,13 +332,13 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
     { icon: MapPin, text: "Best Neighborhoods", action: "What are the best NYC neighborhoods for someone my age?" }
   ];
 
-  const ItemCard = ({ item }) => (
+  const ItemCard: React.FC<{ item: Item }> = ({ item }) => (
     <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-4 border-2 border-transparent hover:border-blue-200 transition-all duration-300 hover:scale-[1.02]">
       <div className="flex justify-between items-start mb-3">
         <div>
           <h4 className="font-bold text-gray-900">{item.name}</h4>
           <div className="flex gap-1 mt-1">
-            {item.tags.map(tag => (
+            {item.tags.map((tag: string) => (
               <span key={tag} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
                 {tag}
               </span>
@@ -352,14 +387,14 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
     </div>
   );
 
-  const ApartmentCard = ({ apartment }) => (
+  const ApartmentCard: React.FC<{ apartment: Apartment }> = ({ apartment }) => (
     <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-4 border-2 border-transparent hover:border-purple-200 transition-all duration-300 hover:scale-[1.02]">
       <div className="flex justify-between items-start mb-3">
         <div className="flex-1">
           <h4 className="font-bold text-gray-900 mb-1">{apartment.address}</h4>
           <p className="text-sm text-gray-600 mb-2">{apartment.notes}</p>
           <div className="flex gap-2 mb-2">
-            {apartment.amenities.slice(0, 2).map(amenity => (
+            {apartment.amenities.slice(0, 2).map((amenity: string) => (
               <span key={amenity} className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
                 {amenity}
               </span>
@@ -416,9 +451,8 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      {/* Notifications */}
       <div className="fixed top-4 right-4 z-50 space-y-2">
-        {notifications.map(notification => (
+        {notifications.map((notification: Notification) => (
           <div 
             key={notification.id}
             className={`px-4 py-3 rounded-xl shadow-lg transform transition-all duration-300 ${
@@ -433,7 +467,6 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
       </div>
 
       <div className="max-w-6xl mx-auto p-4">
-        {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-4xl font-black bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
             SF → NYC ✨
@@ -441,9 +474,8 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
           <p className="text-gray-600 text-lg">Your AI-powered moving assistant that actually gets it</p>
         </div>
 
-        {/* Agent Status - Floating Pills */}
         <div className="flex justify-center gap-3 mb-6 flex-wrap">
-          {Object.entries(agents).map(([agentName, status]) => (
+          {Object.entries(agents).map(([agentName, status]: [string, Agent]) => (
             <div key={agentName} className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
               status.active ? 'bg-green-100 text-green-800 shadow-lg scale-105' : 'bg-white text-gray-600 shadow-sm'
             }`}>
@@ -454,7 +486,6 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
           ))}
         </div>
 
-        {/* Quick Actions Floating Button */}
         <div className="fixed bottom-6 right-6 z-40">
           <button
             onClick={() => setShowQuickActions(!showQuickActions)}
@@ -482,7 +513,6 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
           )}
         </div>
 
-        {/* Photo Upload Hidden Input */}
         <input
           ref={fileInputRef}
           type="file"
@@ -491,11 +521,8 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
           className="hidden"
         />
 
-        {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Items & Apartments */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Items Section */}
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -510,11 +537,10 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
                 </button>
               </div>
               <div className="grid gap-4">
-                {items.map(item => <ItemCard key={item.id} item={item} />)}
+                {items.map((item: Item) => <ItemCard key={item.id} item={item} />)}
               </div>
             </div>
 
-            {/* Apartments Section */}
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -529,41 +555,38 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
                 </button>
               </div>
               <div className="grid gap-4">
-                {apartments.map(apartment => <ApartmentCard key={apartment.id} apartment={apartment} />)}
+                {apartments.map((apartment: Apartment) => <ApartmentCard key={apartment.id} apartment={apartment} />)}
               </div>
             </div>
           </div>
 
-          {/* Right Column - Chat & Stats */}
           <div className="space-y-6">
-            {/* Quick Stats */}
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-sm">
               <h3 className="text-xl font-bold mb-4 text-gray-900">📊 Quick Stats</h3>
               <div className="space-y-4">
                 <div className="bg-gradient-to-r from-green-100 to-green-50 p-4 rounded-xl">
                   <div className="text-2xl font-black text-green-600">
-                    ${items.reduce((sum, item) => sum + item.estimatedValue, 0)}
+                    ${items.reduce((sum: number, item: Item) => sum + item.estimatedValue, 0)}
                   </div>
                   <div className="text-sm text-gray-600">💰 Total item value</div>
                 </div>
                 
                 <div className="bg-gradient-to-r from-blue-100 to-blue-50 p-4 rounded-xl">
                   <div className="text-2xl font-black text-blue-600">
-                    +${expenses.filter(e => e.type === 'monthly').reduce((sum, e) => sum + e.amount, 0)}
+                    +${expenses.filter((e: Expense) => e.type === 'monthly').reduce((sum: number, e: Expense) => sum + e.amount, 0)}
                   </div>
                   <div className="text-sm text-gray-600">📈 Monthly change</div>
                 </div>
                 
                 <div className="bg-gradient-to-r from-purple-100 to-purple-50 p-4 rounded-xl">
                   <div className="text-2xl font-black text-purple-600">
-                    {todos.filter(t => !t.completed).length}
+                    {todos.filter((t: Todo) => !t.completed).length}
                   </div>
                   <div className="text-sm text-gray-600">✅ Tasks left</div>
                 </div>
               </div>
             </div>
 
-            {/* AI Chat */}
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-sm overflow-hidden">
               <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white">
                 <h3 className="font-bold flex items-center gap-2">
@@ -572,7 +595,7 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
               </div>
               
               <div className="h-80 overflow-y-auto p-4 space-y-3">
-                {messages.map(message => (
+                {messages.map((message: Message) => (
                   <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-xs px-4 py-3 rounded-2xl ${
                       message.type === 'user' 
@@ -587,7 +610,7 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
                       <div className="text-sm">{message.content}</div>
                       {message.quickActions && (
                         <div className="mt-2 space-y-1">
-                          {message.quickActions.map((action, idx) => (
+                          {message.quickActions.map((action: string, idx: number) => (
                             <button
                               key={idx}
                               onClick={() => handleQuickAction(action)}
@@ -623,8 +646,8 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
                   <input
                     type="text"
                     value={currentInput}
-                    onChange={(e) => setCurrentInput(e.target.value)}
-                    onKeyPress={(e) => {
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentInput(e.target.value)}
+                    onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
                       if (e.key === 'Enter' && currentInput.trim()) {
                         handleAgentQuery(currentInput);
                         setCurrentInput('');
