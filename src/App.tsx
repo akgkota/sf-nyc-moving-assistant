@@ -79,7 +79,7 @@ const MovingAssistantApp = () => {
     coordinatorAgent: { emoji: '🧠', name: 'Coordinator' }
   };
 
-  const handleAgentQuery = async (query) => {
+  const handleAgentQuery = async (query: string) => {
     setIsProcessing(true);
     
     setMessages(prev => [...prev, {
@@ -339,8 +339,8 @@ const MovingAssistantApp = () => {
                 <button 
                   style={styles.button}
                   onClick={() => handleAgentQuery(`Help me optimize pricing for ${item.name}`)}
-                  onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                  onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                  onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.transform = 'scale(1)'}
                 >
                   💡 Optimize
                 </button>
@@ -386,8 +386,8 @@ const MovingAssistantApp = () => {
               <button 
                 style={styles.button}
                 onClick={() => handleAgentQuery(`Schedule visit for ${apartment.address}`)}
-                onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.transform = 'scale(1.05)'}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => e.currentTarget.style.transform = 'scale(1)'}
               >
                 📅 {apartment.visited ? 'Reschedule' : 'Schedule Visit'}
               </button>
@@ -430,8 +430,8 @@ const MovingAssistantApp = () => {
             <input
               type="text"
               value={currentInput}
-              onChange={(e) => setCurrentInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentInput(e.target.value)}
+              onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleSubmit()}
               placeholder="Ask me anything about your move..."
               style={styles.input}
             />
@@ -465,8 +465,8 @@ const MovingAssistantApp = () => {
                 handleAgentQuery(action);
                 setShowQuickActions(false);
               }}
-              onMouseEnter={(e) => e.target.style.background = '#e9ecef'}
-              onMouseLeave={(e) => e.target.style.background = '#f8f9fa'}
+              onMouseEnter={(e: React.MouseEvent<HTMLDivElement>) => e.currentTarget.style.background = '#e9ecef'}
+              onMouseLeave={(e: React.MouseEvent<HTMLDivElement>) => e.currentTarget.style.background = '#f8f9fa'}
             >
               {action}
             </div>
