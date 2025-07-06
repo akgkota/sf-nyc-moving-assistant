@@ -1,5 +1,153 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Camera, MapPin, DollarSign, Calendar, CheckSquare, Search, Upload, Brain, Users, Home, TrendingUp, Calculator, Zap, Star, Clock, ChevronRight, Plus, X, Check, Eye, MessageCircle, Heart, Share2, Filter } from 'lucide-react';
+
+// Since Tailwind might not be available, let's use inline styles for the preview
+const styles = {
+  container: {
+    minHeight: '100vh',
+    background: 'linear-gradient(135deg, #f0f9ff 0%, #f3e8ff 50%, #fdf2f8 100%)',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  },
+  header: {
+    textAlign: 'center' as const,
+    marginBottom: '24px'
+  },
+  title: {
+    fontSize: '3rem',
+    fontWeight: '900',
+    background: 'linear-gradient(135deg, #2563eb, #7c3aed, #db2777)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    marginBottom: '8px'
+  },
+  subtitle: {
+    color: '#6b7280',
+    fontSize: '1.125rem'
+  },
+  agentPill: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '8px 16px',
+    borderRadius: '9999px',
+    fontSize: '0.875rem',
+    fontWeight: '500',
+    background: '#ffffff',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+    margin: '4px'
+  },
+  agentPillActive: {
+    background: '#dcfce7',
+    color: '#166534',
+    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+    transform: 'scale(1.05)'
+  },
+  quickActionButton: {
+    position: 'fixed' as const,
+    bottom: '24px',
+    right: '24px',
+    width: '56px',
+    height: '56px',
+    background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '50%',
+    boxShadow: '0 10px 15px rgba(0,0,0,0.1)',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'all 0.2s',
+    zIndex: 40
+  },
+  card: {
+    background: 'rgba(255,255,255,0.8)',
+    backdropFilter: 'blur(8px)',
+    borderRadius: '24px',
+    padding: '24px',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+    marginBottom: '24px'
+  },
+  itemCard: {
+    background: 'linear-gradient(135deg, #eff6ff, #f3e8ff)',
+    borderRadius: '16px',
+    padding: '16px',
+    border: '2px solid transparent',
+    transition: 'all 0.3s',
+    marginBottom: '16px',
+    cursor: 'pointer'
+  },
+  apartmentCard: {
+    background: 'linear-gradient(135deg, #faf5ff, #fdf2f8)',
+    borderRadius: '16px',
+    padding: '16px',
+    border: '2px solid transparent',
+    transition: 'all 0.3s',
+    marginBottom: '16px',
+    cursor: 'pointer'
+  },
+  button: {
+    background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+    color: 'white',
+    border: 'none',
+    padding: '8px 16px',
+    borderRadius: '12px',
+    fontWeight: '500',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    transition: 'all 0.2s'
+  },
+  tag: {
+    padding: '4px 8px',
+    background: '#dbeafe',
+    color: '#1d4ed8',
+    fontSize: '0.75rem',
+    borderRadius: '9999px',
+    display: 'inline-block',
+    margin: '2px'
+  },
+  stat: {
+    padding: '16px',
+    borderRadius: '12px',
+    marginBottom: '16px'
+  },
+  greenStat: {
+    background: 'linear-gradient(135deg, #d1fae5, #ecfdf5)'
+  },
+  blueStat: {
+    background: 'linear-gradient(135deg, #dbeafe, #eff6ff)'
+  },
+  purpleStat: {
+    background: 'linear-gradient(135deg, #e9d5ff, #f3e8ff)'
+  },
+  chatContainer: {
+    height: '320px',
+    overflowY: 'auto' as const,
+    padding: '16px',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '12px'
+  },
+  userMessage: {
+    alignSelf: 'flex-end',
+    background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+    color: 'white',
+    padding: '12px 16px',
+    borderRadius: '16px',
+    maxWidth: '280px',
+    fontSize: '0.875rem'
+  },
+  agentMessage: {
+    alignSelf: 'flex-start',
+    background: '#f3f4f6',
+    color: '#374151',
+    padding: '12px 16px',
+    borderRadius: '16px',
+    maxWidth: '280px',
+    fontSize: '0.875rem'
+  }
+};
 
 interface Item {
   id: number;
@@ -480,58 +628,452 @@ Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      <div className="fixed top-4 right-4 z-50 space-y-2">
+    <div style={styles.container}>
+      {/* Notifications */}
+      <div style={{position: 'fixed', top: '16px', right: '16px', zIndex: 50, display: 'flex', flexDirection: 'column', gap: '8px'}}>
         {notifications.map((notification: Notification) => (
           <div 
             key={notification.id}
-            className={`px-4 py-3 rounded-xl shadow-lg transform transition-all duration-300 ${
-              notification.type === 'success' ? 'bg-green-500 text-white' :
-              notification.type === 'error' ? 'bg-red-500 text-white' :
-              'bg-blue-500 text-white'
-            }`}
+            style={{
+              padding: '12px 16px',
+              borderRadius: '12px',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              background: notification.type === 'success' ? '#10b981' : notification.type === 'error' ? '#ef4444' : '#3b82f6',
+              color: 'white',
+              fontSize: '0.875rem'
+            }}
           >
             {notification.message}
           </div>
         ))}
       </div>
 
-      <div className="max-w-6xl mx-auto p-4">
-        <div className="text-center mb-6">
-          <h1 className="text-4xl font-black bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-            SF → NYC ✨
-          </h1>
-          <p className="text-gray-600 text-lg">Your AI-powered moving assistant that actually gets it</p>
+      <div style={{maxWidth: '1200px', margin: '0 auto', padding: '16px'}}>
+        {/* Header */}
+        <div style={styles.header}>
+          <h1 style={styles.title}>SF → NYC ✨</h1>
+          <p style={styles.subtitle}>Your AI-powered moving assistant that actually gets it</p>
         </div>
 
-        <div className="flex justify-center gap-3 mb-6 flex-wrap">
+        {/* Agent Status */}
+        <div style={{display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '24px', flexWrap: 'wrap'}}>
           {Object.entries(agents).map(([agentName, status]: [string, Agent]) => (
-            <div key={agentName} className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
-              status.active ? 'bg-green-100 text-green-800 shadow-lg scale-105' : 'bg-white text-gray-600 shadow-sm'
-            }`}>
-              <span className="text-lg">{status.emoji}</span>
-              <span className="text-sm font-medium">{agentName.replace('Agent', '').replace(/([A-Z])/g, ' $1').trim()}</span>
-              {status.active && <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>}
+            <div 
+              key={agentName} 
+              style={{
+                ...styles.agentPill,
+                ...(status.active ? styles.agentPillActive : {})
+              }}
+            >
+              <span style={{fontSize: '1.125rem'}}>{status.emoji}</span>
+              <span>{agentName.replace('Agent', '').replace(/([A-Z])/g, ' $1').trim()}</span>
+              {status.active && <div style={{width: '8px', height: '8px', background: '#10b981', borderRadius: '50%'}}></div>}
             </div>
           ))}
         </div>
 
-        <div className="fixed bottom-6 right-6 z-40">
-          <button
-            onClick={() => setShowQuickActions(!showQuickActions)}
-            className="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200 flex items-center justify-center"
-          >
-            {showQuickActions ? <X className="w-6 h-6" /> : <Zap className="w-6 h-6" />}
-          </button>
-          
-          {showQuickActions && (
-            <div className="absolute bottom-16 right-0 bg-white rounded-2xl shadow-xl p-4 w-64 border">
-              <h3 className="font-bold mb-3 text-gray-900">Quick Actions ⚡</h3>
-              <div className="space-y-2">
-                {quickActions.map((action, idx) => (
+        {/* Quick Actions Button */}
+        <button
+          onClick={() => setShowQuickActions(!showQuickActions)}
+          style={styles.quickActionButton}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.1)';
+            e.currentTarget.style.boxShadow = '0 20px 25px rgba(0,0,0,0.15)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 10px 15px rgba(0,0,0,0.1)';
+          }}
+        >
+          {showQuickActions ? '✕' : '⚡'}
+        </button>
+        
+        {showQuickActions && (
+          <div style={{
+            position: 'fixed',
+            bottom: '88px',
+            right: '24px',
+            background: 'white',
+            borderRadius: '16px',
+            boxShadow: '0 20px 25px rgba(0,0,0,0.1)',
+            padding: '16px',
+            width: '256px',
+            zIndex: 30
+          }}>
+            <h3 style={{fontWeight: 'bold', marginBottom: '12px', color: '#111827'}}>Quick Actions ⚡</h3>
+            <div style={{display: 'flex', flexDirection: 'column', gap: '8px'}}>
+              {quickActions.map((action, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleQuickAction(action.action)}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '12px',
+                    background: 'transparent',
+                    border: 'none',
+                    borderRadius: '12px',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'background 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                                      <span style={{color: '#3b82f6', fontSize: '1.25rem'}}>📱</span>
+                  <span style={{fontSize: '0.875rem', fontWeight: '500'}}>{action.text}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handlePhotoUpload}
+          style={{display: 'none'}}
+        />
+
+        {/* Main Content Grid */}
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px'}}>
+          {/* Items Section */}
+          <div style={styles.card}>
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px'}}>
+              <h2 style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#111827'}}>💰 Items to Sell</h2>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  ...styles.button,
+                  background: 'linear-gradient(135deg, #10b981, #3b82f6)'
+                }}
+              >
+                📸 Snap & Price
+              </button>
+            </div>
+            {items.map((item: Item) => (
+              <div key={item.id} style={styles.itemCard}>
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px'}}>
+                  <div>
+                    <h4 style={{fontWeight: 'bold', color: '#111827', marginBottom: '4px'}}>{item.name}</h4>
+                    <div style={{display: 'flex', gap: '4px', flexWrap: 'wrap'}}>
+                      {item.tags.map((tag: string) => (
+                        <span key={tag} style={styles.tag}>{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{textAlign: 'right'}}>
+                    <div style={{fontSize: '1.5rem', fontWeight: '900', color: '#059669'}}>${item.estimatedValue}</div>
+                    <div style={{fontSize: '0.75rem', color: '#6b7280'}}>{item.condition}</div>
+                  </div>
+                </div>
+                
+                <p style={{fontSize: '0.875rem', color: '#6b7280', marginBottom: '12px'}}>{item.marketResearch}</p>
+                
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
+                  <div style={{display: 'flex', gap: '12px', fontSize: '0.75rem', color: '#6b7280'}}>
+                    <span>👁️ {item.views}</span>
+                    <span>❤️ {item.likes}</span>
+                  </div>
+                  <span style={{
+                    padding: '4px 12px',
+                    borderRadius: '9999px',
+                    fontSize: '0.75rem',
+                    fontWeight: '500',
+                    background: item.status === 'listed' ? '#d1fae5' : item.status === 'researching' ? '#fef3c7' : '#f3f4f6',
+                    color: item.status === 'listed' ? '#065f46' : item.status === 'researching' ? '#92400e' : '#6b7280'
+                  }}>
+                    {item.status === 'listed' ? '🔥 Live' : item.status === 'researching' ? '🔍 Analyzing' : '⏳ Pending'}
+                  </span>
+                </div>
+                
+                <div style={{display: 'flex', gap: '8px'}}>
+                  <button 
+                    onClick={() => handleAgentQuery(`Get me the latest pricing for ${item.name} and optimization tips`, 'itemValuationAgent')}
+                    style={{flex: 1, ...styles.button}}
+                  >
+                    💡 Optimize
+                  </button>
+                  <button style={{
+                    padding: '8px 12px',
+                    background: '#f3f4f6',
+                    border: 'none',
+                    borderRadius: '12px',
+                    cursor: 'pointer'
+                  }}>
+                    📤
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Apartments Section */}
+          <div style={styles.card}>
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px'}}>
+              <h2 style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#111827'}}>🏠 NYC Apartments</h2>
+              <button
+                onClick={() => handleAgentQuery('Find me 3 new apartments based on my preferences', 'apartmentAgent')}
+                style={{
+                  ...styles.button,
+                  background: 'linear-gradient(135deg, #8b5cf6, #ec4899)'
+                }}
+              >
+                🔍 Find More
+              </button>
+            </div>
+            {apartments.map((apartment: Apartment) => (
+              <div key={apartment.id} style={styles.apartmentCard}>
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px'}}>
+                  <div style={{flex: 1}}>
+                    <h4 style={{fontWeight: 'bold', color: '#111827', marginBottom: '4px'}}>{apartment.address}</h4>
+                    <p style={{fontSize: '0.875rem', color: '#6b7280', marginBottom: '8px'}}>{apartment.notes}</p>
+                    <div style={{display: 'flex', gap: '8px', marginBottom: '8px'}}>
+                      {apartment.amenities.slice(0, 2).map((amenity: string) => (
+                        <span key={amenity} style={{
+                          padding: '2px 8px',
+                          background: '#e9d5ff',
+                          color: '#7c2d12',
+                          fontSize: '0.75rem',
+                          borderRadius: '9999px'
+                        }}>
+                          {amenity}
+                        </span>
+                      ))}
+                      {apartment.amenities.length > 2 && (
+                        <span style={{
+                          padding: '2px 8px',
+                          background: '#f3f4f6',
+                          color: '#6b7280',
+                          fontSize: '0.75rem',
+                          borderRadius: '9999px'
+                        }}>
+                          +{apartment.amenities.length - 2}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div style={{textAlign: 'right'}}>
+                    <div style={{fontSize: '1.5rem', fontWeight: '900', color: '#7c3aed'}}>${apartment.rent}</div>
+                    <div style={{fontSize: '0.75rem', color: '#6b7280'}}>/month</div>
+                  </div>
+                </div>
+                
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', fontSize: '0.75rem', color: '#6b7280'}}>
+                  <span>📸 {apartment.photos} photos</span>
+                  <span>🚇 {apartment.commute}</span>
+                  <span>📅 Available {apartment.available}</span>
+                </div>
+                
+                {apartment.score > 0 && (
+                  <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px'}}>
+                    <span style={{fontSize: '0.875rem', fontWeight: '500'}}>Your Score:</span>
+                    <div style={{display: 'flex', gap: '2px'}}>
+                      {[...Array(10)].map((_, i) => (
+                        <span 
+                          key={i} 
+                          style={{
+                            color: i < apartment.score ? '#fbbf24' : '#d1d5db',
+                            fontSize: '0.75rem'
+                          }}
+                        >
+                          ★
+                        </span>
+                      ))}
+                    </div>
+                    <span style={{fontSize: '0.875rem', fontWeight: 'bold', color: '#7c3aed'}}>{apartment.score}/10</span>
+                  </div>
+                )}
+                
+                <div style={{display: 'flex', gap: '8px'}}>
+                  <button 
+                    onClick={() => scheduleApartmentVisit(apartment.id)}
+                    style={{
+                      flex: 1,
+                      ...styles.button,
+                      background: 'linear-gradient(135deg, #8b5cf6, #ec4899)'
+                    }}
+                  >
+                    📅 {apartment.visited ? 'Reschedule' : 'Schedule Visit'}
+                  </button>
+                  {apartment.virtual_tour && (
+                    <button style={{
+                      padding: '8px 12px',
+                      background: '#e9d5ff',
+                      color: '#7c3aed',
+                      border: 'none',
+                      borderRadius: '12px',
+                      cursor: 'pointer'
+                    }}>
+                      👁️ Tour
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Stats & Chat Section */}
+          <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>
+            {/* Quick Stats */}
+            <div style={styles.card}>
+              <h3 style={{fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '16px', color: '#111827'}}>📊 Quick Stats</h3>
+              <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+                <div style={{...styles.stat, ...styles.greenStat}}>
+                  <div style={{fontSize: '1.5rem', fontWeight: '900', color: '#059669'}}>
+                    ${items.reduce((sum: number, item: Item) => sum + item.estimatedValue, 0)}
+                  </div>
+                  <div style={{fontSize: '0.875rem', color: '#6b7280'}}>💰 Total item value</div>
+                </div>
+                
+                <div style={{...styles.stat, ...styles.blueStat}}>
+                  <div style={{fontSize: '1.5rem', fontWeight: '900', color: '#2563eb'}}>
+                    +${expenses.filter((e: Expense) => e.type === 'monthly').reduce((sum: number, e: Expense) => sum + e.amount, 0)}
+                  </div>
+                  <div style={{fontSize: '0.875rem', color: '#6b7280'}}>📈 Monthly change</div>
+                </div>
+                
+                <div style={{...styles.stat, ...styles.purpleStat}}>
+                  <div style={{fontSize: '1.5rem', fontWeight: '900', color: '#7c3aed'}}>
+                    {todos.filter((t: Todo) => !t.completed).length}
+                  </div>
+                  <div style={{fontSize: '0.875rem', color: '#6b7280'}}>✅ Tasks left</div>
+                </div>
+              </div>
+            </div>
+
+            {/* AI Chat */}
+            <div style={{...styles.card, padding: 0, overflow: 'hidden'}}>
+              <div style={{
+                padding: '16px',
+                background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                color: 'white'
+              }}>
+                <h3 style={{fontWeight: 'bold', margin: 0}}>🤖 AI Assistant</h3>
+              </div>
+              
+              <div style={styles.chatContainer}>
+                {messages.map((message: Message) => (
+                  <div 
+                    key={message.id} 
+                    style={message.type === 'user' ? styles.userMessage : styles.agentMessage}
+                  >
+                    {message.agent && (
+                      <div style={{fontSize: '0.75rem', opacity: 0.75, marginBottom: '4px'}}>
+                        {agents[message.agent]?.emoji} {message.agent.replace('Agent', '')}
+                      </div>
+                    )}
+                    <div>{message.content}</div>
+                    {message.quickActions && (
+                      <div style={{marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px'}}>
+                        {message.quickActions.map((action: string, idx: number) => (
+                          <button
+                            key={idx}
+                            onClick={() => handleQuickAction(action)}
+                            style={{
+                              padding: '4px 8px',
+                              background: 'rgba(255,255,255,0.2)',
+                              border: 'none',
+                              borderRadius: '8px',
+                              color: 'inherit',
+                              fontSize: '0.75rem',
+                              cursor: 'pointer',
+                              textAlign: 'left'
+                            }}
+                          >
+                            {action}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <div style={{fontSize: '0.75rem', opacity: 0.6, marginTop: '4px'}}>{message.timestamp}</div>
+                  </div>
+                ))}
+                {isProcessing && (
+                  <div style={styles.agentMessage}>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                      <div style={{display: 'flex', gap: '4px'}}>
+                        <div style={{width: '8px', height: '8px', background: '#3b82f6', borderRadius: '50%', animation: 'bounce 1s infinite'}}></div>
+                        <div style={{width: '8px', height: '8px', background: '#8b5cf6', borderRadius: '50%', animation: 'bounce 1s infinite 0.1s'}}></div>
+                        <div style={{width: '8px', height: '8px', background: '#ec4899', borderRadius: '50%', animation: 'bounce 1s infinite 0.2s'}}></div>
+                      </div>
+                      <span style={{fontSize: '0.875rem'}}>AI thinking...</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div style={{padding: '16px', borderTop: '1px solid #e5e7eb', background: '#f9fafb'}}>
+                <div style={{display: 'flex', gap: '8px'}}>
+                  <input
+                    type="text"
+                    value={currentInput}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentInput(e.target.value)}
+                    onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                      if (e.key === 'Enter' && currentInput.trim()) {
+                        handleAgentQuery(currentInput);
+                        setCurrentInput('');
+                      }
+                    }}
+                    placeholder="ask me anything..."
+                    style={{
+                      flex: 1,
+                      padding: '8px 16px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '12px',
+                      outline: 'none',
+                      background: 'white'
+                    }}
+                  />
                   <button
-                    key={idx}
-                    onClick={() => handleQuickAction(action.action)}
+                    onClick={() => {
+                      if (currentInput.trim()) {
+                        handleAgentQuery(currentInput);
+                        setCurrentInput('');
+                      }
+                    }}
+                    disabled={isProcessing || !currentInput.trim()}
+                    style={{
+                      padding: '8px 16px',
+                      background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '12px',
+                      cursor: 'pointer',
+                      opacity: (isProcessing || !currentInput.trim()) ? 0.5 : 1
+                    }}
+                  >
+                    ✨
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Add CSS animations */}
+      <style>{`
+        @keyframes bounce {
+          0%, 20%, 53%, 80%, 100% {
+            transform: translate3d(0,0,0);
+          }
+          40%, 43% {
+            transform: translate3d(0,-30px,0);
+          }
+          70% {
+            transform: translate3d(0,-15px,0);
+          }
+          90% {
+            transform: translate3d(0,-4px,0);
+          }
+        }
+      `}</style>
+    </div>
+  );.action)}
                     className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-all text-left"
                   >
                     <action.icon className="w-5 h-5 text-blue-500" />
