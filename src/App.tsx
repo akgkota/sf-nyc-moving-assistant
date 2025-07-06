@@ -224,8 +224,38 @@ Respond with JSON in this format:
 
 Make it sound natural and helpful, not robotic. Use "yo", "tbh", "ngl" etc. when appropriate.`;
 
-      const response = await window.claude.complete(prompt);
-      const agentResponse = JSON.parse(response);
+      // Simulate AI response for now (replace with real Claude API later)
+      const mockResponse = {
+        response: `Hey! 👋 I'm working on ${query}. This is a simulated response for now - connect the real Claude API to get intelligent responses!`,
+        actions: ["Simulated action 1", "Simulated action 2"],
+        updates: {
+          items: [],
+          apartments: [],
+          expenses: [],
+          todos: []
+        },
+        quickActions: ["Try another query", "Check out the other features"],
+        recommendations: ["This will be smart once connected to Claude API", "For now, explore the UI!"]
+      };
+
+      // TODO: Replace with real Claude API call:
+      // const response = await fetch('https://api.anthropic.com/v1/messages', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'x-api-key': process.env.REACT_APP_CLAUDE_API_KEY,
+      //     'anthropic-version': '2023-06-01'
+      //   },
+      //   body: JSON.stringify({
+      //     model: 'claude-3-sonnet-20240229',
+      //     max_tokens: 1000,
+      //     messages: [{ role: 'user', content: prompt }]
+      //   })
+      // });
+      // const data = await response.json();
+      // const agentResponse = JSON.parse(data.content[0].text);
+
+      const agentResponse = mockResponse;
 
       if (agentResponse.updates.items?.length > 0) {
         setItems(prev => [...prev, ...agentResponse.updates.items]);
