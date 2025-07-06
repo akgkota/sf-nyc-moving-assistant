@@ -3,10 +3,41 @@ import { Camera, MapPin, DollarSign, Calendar, CheckSquare, Search, Upload, Brai
 
 const MovingAssistantApp = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [items, setItems] = useState([]);
-  const [apartments, setApartments] = useState([]);
-  const [expenses, setExpenses] = useState([]);
-  const [todos, setTodos] = useState([]);
+  const [items, setItems] = useState([
+    { 
+      id: 1, 
+      name: 'MacBook Pro 16" M3', 
+      image: null, 
+      estimatedValue: 2400, 
+      marketResearch: 'M3 MacBooks are 🔥 rn - similar ones going for $2200-2600', 
+      status: 'researching',
+      condition: 'Like New',
+      tags: ['tech', 'laptop', 'apple'],
+      views: 0,
+      likes: 0
+    }
+  ]);
+  const [apartments, setApartments] = useState([
+    { 
+      id: 1, 
+      address: '123 E 34th St, Manhattan', 
+      rent: 3500, 
+      visited: false, 
+      notes: 'Midtown vibes ✨ Close to everything', 
+      score: 0,
+      photos: 8,
+      amenities: ['gym', 'rooftop', 'laundry'],
+      commute: '15 min to FiDi',
+      available: '2025-08-01',
+      virtual_tour: true
+    }
+  ]);
+  const [expenses, setExpenses] = useState([
+    { id: 1, category: 'Housing', item: 'Rent Difference (SF→NYC)', amount: 800, type: 'monthly', details: 'SF: $2700/mo → NYC: $3500/mo', emoji: '🏠' }
+  ]);
+  const [todos, setTodos] = useState([
+    { id: 1, task: 'Take photos of MacBook', agent: 'itemValuationAgent', completed: false, priority: 'high', emoji: '📱' }
+  ]);
   const [messages, setMessages] = useState([]);
   const [currentInput, setCurrentInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
