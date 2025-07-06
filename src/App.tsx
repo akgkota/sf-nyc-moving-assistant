@@ -38,7 +38,14 @@ const MovingAssistantApp = () => {
   const [todos, setTodos] = useState([
     { id: 1, task: 'Take photos of MacBook', agent: 'itemValuationAgent', completed: false, priority: 'high', emoji: '📱' }
   ]);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([{
+    id: Date.now(),
+    type: 'agent',
+    agent: 'coordinatorAgent',
+    content: "yo! 👋 ready to make this SF→NYC move smooth af? I've got your back with smart pricing, apartment hunting, and expense tracking. what do you wanna tackle first?",
+    timestamp: new Date().toLocaleTimeString(),
+    reactions: []
+  }]);
   const [currentInput, setCurrentInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showQuickActions, setShowQuickActions] = useState(false);
@@ -153,15 +160,7 @@ const MovingAssistantApp = () => {
       { id: 4, task: 'List iPhone on FB Marketplace', agent: 'itemValuationAgent', completed: true, priority: 'high', emoji: '✅' }
     ]);
 
-    // Welcome message
-    setMessages([{
-      id: Date.now(),
-      type: 'agent',
-      agent: 'coordinatorAgent',
-      content: "yo! 👋 ready to make this SF→NYC move smooth af? I've got your back with smart pricing, apartment hunting, and expense tracking. what do you wanna tackle first?",
-      timestamp: new Date().toLocaleTimeString(),
-      reactions: []
-    }]);
+    // Data is already initialized above, no need to set again
   }, []);
 
   const handleAgentQuery = async (query, targetAgent = 'coordinatorAgent') => {
